@@ -73,9 +73,11 @@ public class LinkedList<T> implements Collection<T> {
         }
 
         /**
-         * Returns {@code true} if the iteration has more elements when traversing in the reverse direction.
+         * Returns {@code true} if the iteration has more elements when traversing in
+         * the reverse direction.
          *
-         * @return {@code true} if the iteration has more elements when traversing in the reverse direction
+         * @return {@code true} if the iteration has more elements when traversing in
+         *         the reverse direction
          */
         @Override
         public boolean hasPrevious() {
@@ -138,6 +140,7 @@ public class LinkedList<T> implements Collection<T> {
             this.length = 1;
             return;
         }
+
         newNode.previous = this.tail;
         this.tail.next = newNode;
         this.tail = newNode;
@@ -145,7 +148,8 @@ public class LinkedList<T> implements Collection<T> {
     }
 
     /**
-     * Removes the first occurrence of the specified element from this list, if it is present.
+     * Removes the first occurrence of the specified element from this list, if it
+     * is present.
      *
      * @param element the element to be removed
      */
@@ -165,6 +169,7 @@ public class LinkedList<T> implements Collection<T> {
                         this.removeLast();
                         return;
                     }
+
                     currentNode.previous.next = currentNode.next;
                     currentNode.next.previous = currentNode.previous;
                     currentNode = null;
@@ -496,10 +501,12 @@ public class LinkedList<T> implements Collection<T> {
     }
 
     /**
-     * Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element.
+     * Returns the index of the first occurrence of the specified element in this
+     * list, or -1 if this list does not contain the element.
      *
      * @param element the element to search for
-     * @return the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element
+     * @return the index of the first occurrence of the specified element in this
+     *         list, or -1 if this list does not contain the element
      */
     public int indexOf(T element) {
         int currentIndex = 0;
