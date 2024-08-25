@@ -285,7 +285,7 @@ public class LinkedList<T> implements Collection<T> {
         Node nodeObject = list.head;
 
         while (nodeThis != null) {
-            if (nodeThis.element != nodeObject.element) {
+            if (!nodeThis.element.equals(nodeObject.element)) {
                 return false;
             }
 
