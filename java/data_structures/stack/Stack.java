@@ -3,7 +3,7 @@ import java.util.NoSuchElementException;
 /**
  * A generic Stack implementation using a linked list.
  *
- * @param <T> the type of elements held in this stack 
+ * @param <T> the type of elements held in this stack
  */
 public class Stack<T> {
 

@@ -108,10 +108,9 @@ public class Queue<T> {
         Node currentNode = this.head;
 
         while (currentNode != null) {
-            rep += " " + currentNode.element;
+            rep = currentNode.element + " " + rep;
             currentNode = currentNode.next;
         }
-
         return rep;
     }
 

@@ -95,7 +95,6 @@ public class LinkedList<T> implements Collection<T> {
             if (this.hasPrevious()) {
                 this.next = this.previous;
                 this.previous = this.next.previous;
-
                 return this.next.element;
             }
 
@@ -132,19 +131,22 @@ public class LinkedList<T> implements Collection<T> {
      */
     @Override
     public void add(T element) {
-        Node newNode = new Node(element);
+        if (element == null) {
+            throw new IllegalArgumentException();
+        }
 
-        if (this.tail == null) {
-            this.head = newNode;
-            this.tail = newNode;
-            this.length = 1;
+        Node newNode = new Node(element);
+        length++;
+
+        if (head == null) {
+            head = newNode;
+            tail = newNode;
             return;
         }
 
-        newNode.previous = this.tail;
         this.tail.next = newNode;
+        newNode.previous = this.tail;
         this.tail = newNode;
-        this.length += 1;
     }
 
     /**
@@ -155,29 +157,29 @@ public class LinkedList<T> implements Collection<T> {
      */
     @Override
     public void remove(T element) {
-        if (this.head != null) {
-            Node currentNode = this.head;
+        Node currentNode = head;
 
-            while (currentNode != null) {
-                if (currentNode.element.equals(element)) {
-                    if (currentNode.previous == null) {
-                        this.removeFirst();
-                        return;
-                    }
+        while (currentNode != null) {
+            if (currentNode.element.equals(element)) {
 
-                    if (currentNode.next == null) {
-                        this.removeLast();
-                        return;
-                    }
-
-                    currentNode.previous.next = currentNode.next;
-                    currentNode.next.previous = currentNode.previous;
-                    currentNode = null;
-                    this.length--;
+                if (currentNode.previous == null) {
+                    this.removeFirst();
                     return;
                 }
-                currentNode = currentNode.next;
+
+                if (currentNode.next == null) {
+                    this.removeLast();
+                    return;
+                }
+
+                this.length--;
+                currentNode.previous.next = currentNode.next;
+                currentNode.next.previous = currentNode.previous;
+
+                return;
             }
+
+            currentNode = currentNode.next;
         }
     }
 
@@ -195,7 +197,9 @@ public class LinkedList<T> implements Collection<T> {
             if (currentNode.element.equals(element)) {
                 return true;
             }
+
             currentNode = currentNode.next;
+
         }
 
         return false;
@@ -248,19 +252,24 @@ public class LinkedList<T> implements Collection<T> {
      */
     @Override
     public String toString() {
-        if (this.head == null) {
+        Node currentNode = this.head;
+
+        if (currentNode == null) {
             return "[]";
         }
 
         String rep = "[" + this.head.element;
-        Node currentNode = this.head.next;
+        currentNode = currentNode.next;
 
         while (currentNode != null) {
-            rep += "," + " " + currentNode.element;
+            rep += ", " + currentNode.element;
             currentNode = currentNode.next;
         }
 
-        return rep + "]";
+        rep += "]";
+        System.out.println(rep);
+        return rep;
+
     }
 
     /**
@@ -271,7 +280,7 @@ public class LinkedList<T> implements Collection<T> {
      */
     @Override
     public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) {
+        if (object == null || this.getClass() != object.getClass()) {
             return false;
         }
         @SuppressWarnings("unchecked")
@@ -302,7 +311,7 @@ public class LinkedList<T> implements Collection<T> {
      * @return the number of elements in this list
      */
     public int getLength() {
-        return this.length;
+        return getElements();
     }
 
     /**
@@ -311,7 +320,21 @@ public class LinkedList<T> implements Collection<T> {
      * @param element the element to be added
      */
     public void addEnd(T element) {
-        this.add(element);
+        if (element == null) {
+            throw new IllegalArgumentException();
+        }
+        Node newNode = new Node(element);
+        this.length++;
+
+        if (this.head == null) {
+            this.head = newNode;
+            this.tail = newNode;
+            return;
+        }
+
+        this.tail.next = newNode;
+        newNode.previous = this.tail;
+        this.tail = newNode;
     }
 
     /**
@@ -320,18 +343,21 @@ public class LinkedList<T> implements Collection<T> {
      * @param element the element to be added
      */
     public void addStart(T element) {
+        if (element == null) {
+            throw new IllegalArgumentException();
+        }
         Node newNode = new Node(element);
+        this.length++;
 
         if (this.head == null) {
             this.head = newNode;
             this.tail = newNode;
-            this.length = 1;
             return;
         }
 
         newNode.next = this.head;
+        this.head.previous = newNode;
         this.head = newNode;
-        this.length++;
     }
 
     /**
@@ -341,26 +367,34 @@ public class LinkedList<T> implements Collection<T> {
      * @param element the element to be inserted
      */
     public void insert(int index, T element) {
+        if (element == null) {
+            throw new IllegalArgumentException();
+        }
+
         if (index <= 0) {
             this.addStart(element);
-        } else if (index >= this.length) {
-            this.add(element);
-        } else {
-            int currentIndex = 1;
-            Node currentNode = this.head.next;
-            Node newNode = new Node(element);
-
-            while (currentIndex != index) {
-                currentNode = currentNode.next;
-                currentIndex++;
-            }
-
-            currentNode.previous.next = newNode;
-            newNode.previous = currentNode.previous;
-            currentNode.previous = newNode;
-            newNode.next = currentNode;
-            this.length++;
+            return;
         }
+
+        if (index >= this.length) {
+            this.addEnd(element);
+            return;
+        }
+
+        Node newNode = new Node(element);
+        Node currentNode = this.head.next;
+        int currentIndex = 1;
+        this.length++;
+
+        while (currentIndex != index) {
+            currentIndex++;
+            currentNode = currentNode.next;
+        }
+
+        newNode.previous = currentNode.previous;
+        newNode.next = currentNode;
+        newNode.previous.next = newNode;
+        newNode.next.previous = newNode;
     }
 
     /**
@@ -374,17 +408,16 @@ public class LinkedList<T> implements Collection<T> {
             throw new NoSuchElementException();
         }
 
-        if (this.length == 1) {
-            T elem = this.head.element;
-            this.clear();
-            return elem;
-        }
-
         T element = this.head.element;
 
+        if (this.length == 1) {
+            this.clear();
+            return element;
+        }
+
+        this.length--;
         this.head = this.head.next;
         this.head.previous = null;
-        this.length--;
 
         return element;
     }
@@ -396,21 +429,23 @@ public class LinkedList<T> implements Collection<T> {
      * @throws NoSuchElementException if this list is empty
      */
     public T removeLast() {
-        if (this.tail == null) {
+        if (this.head == null) {
             throw new NoSuchElementException();
         }
 
-        if (this.length == 1) {
-            T elem = this.head.element;
-            this.clear();
-            return elem;
-        }
         T element = this.tail.element;
 
-        this.tail = this.tail.previous;
-        this.tail.next.previous = null;
-        this.tail.next = null;
+        if (this.length == 1) {
+            this.clear();
+            return element;
+        }
+
+        System.out.println(this);
+        System.out.println("tail: " + this.tail.element);
+
         this.length--;
+        this.tail = this.tail.previous;
+        this.tail.next = null;
 
         return element;
     }
@@ -425,6 +460,7 @@ public class LinkedList<T> implements Collection<T> {
         if (this.head == null) {
             throw new NoSuchElementException();
         }
+
         return this.head.element;
     }
 
@@ -435,9 +471,10 @@ public class LinkedList<T> implements Collection<T> {
      * @throws NoSuchElementException if this list is empty
      */
     public T getLast() {
-        if (this.tail == null) {
+        if (this.head == null) {
             throw new NoSuchElementException();
         }
+
         return this.tail.element;
     }
 
@@ -449,19 +486,20 @@ public class LinkedList<T> implements Collection<T> {
      * @throws IndexOutOfBoundsException if the index is out of range
      */
     public T get(int index) {
-        if (index < 0 || index >= this.length) {
+        if (index < 0 || index >= this.getLength()) {
             throw new IndexOutOfBoundsException();
         }
 
-        int currentIndex = 0;
         Node currentNode = this.head;
+        int currentIndex = 0;
 
         while (currentIndex != index) {
-            currentNode = currentNode.next;
             currentIndex++;
+            currentNode = currentNode.next;
         }
 
         return currentNode.element;
+
     }
 
     /**
@@ -470,9 +508,8 @@ public class LinkedList<T> implements Collection<T> {
      * @return a shallow copy of this list
      */
     public LinkedList<T> copy() {
-        LinkedList<T> newList = new LinkedList<T>();
-
         Node currentNode = this.head;
+        LinkedList<T> newList = new LinkedList<T>();
 
         while (currentNode != null) {
             newList.add(currentNode.element);
@@ -488,9 +525,8 @@ public class LinkedList<T> implements Collection<T> {
      * @return a new list that is the reverse of this list
      */
     public LinkedList<T> reverse() {
-        LinkedList<T> newList = new LinkedList<T>();
-
         Node currentNode = this.head;
+        LinkedList<T> newList = new LinkedList<T>();
 
         while (currentNode != null) {
             newList.addStart(currentNode.element);
@@ -509,15 +545,16 @@ public class LinkedList<T> implements Collection<T> {
      *         list, or -1 if this list does not contain the element
      */
     public int indexOf(T element) {
-        int currentIndex = 0;
         Node currentNode = this.head;
+        int currentIndex = 0;
 
         while (currentNode != null) {
             if (currentNode.element.equals(element)) {
                 return currentIndex;
             }
-            currentNode = currentNode.next;
+
             currentIndex++;
+            currentNode = currentNode.next;
         }
         return -1;
     }
