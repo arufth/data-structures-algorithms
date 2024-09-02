@@ -17,14 +17,14 @@ public interface NodeBinaryTree<T> {
      *
      * @return true if this node has a left child, false otherwise
      */
-    public boolean hasLeftChild();
+    public boolean hasLeft();
 
     /**
      * Checks if this node has a right child.
      *
      * @return true if this node has a right child, false otherwise
      */
-    public boolean hasRightChild();
+    public boolean hasRight();
 
     /**
      * Returns the parent of this node.

@@ -1,3 +1,5 @@
+
+package collections;
 /**
  * A generic interface for a collection of elements.
  *

@@ -1,4 +1,3 @@
-
 /**
  * Functional interface representing an action to be performed on a node in a
  * binary tree.

@@ -38,7 +38,7 @@ public class Queue<T> {
      */
     public void enqueue(T element) {
         if (element == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Element cannot be null");
         }
         Node newNode = new Node(element);
 
@@ -60,7 +60,7 @@ public class Queue<T> {
      */
     public T dequeue() {
         if (this.head == null) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Queue is empty");
         }
 
         T currentElement = this.head.element;
@@ -81,7 +81,7 @@ public class Queue<T> {
      */
     public T peek() {
         if (this.head == null) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Queue is empty");
         }
 
         return this.head.element;
@@ -103,15 +103,15 @@ public class Queue<T> {
      */
     @Override
     public String toString() {
-        String rep = "";
+        StringBuilder rep = new StringBuilder();
 
         Node currentNode = this.head;
 
         while (currentNode != null) {
-            rep = currentNode.element + " " + rep;
+            rep.insert(0, currentNode.element + " ");
             currentNode = currentNode.next;
         }
-        return rep;
+        return rep.toString().trim();
     }
 
     /**
@@ -122,8 +122,9 @@ public class Queue<T> {
      */
     @Override
     public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass())
+        if (object == null || getClass() != object.getClass()) {
             return false;
+        }
         @SuppressWarnings("unchecked")
         Queue<T> queue = (Queue<T>) object;
 

@@ -1,6 +1,8 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import collections.Collection;
+
 /**
  * A doubly linked list implementation of the Collection interface.
  *

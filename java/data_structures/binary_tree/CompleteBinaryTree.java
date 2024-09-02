@@ -1,5 +1,6 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import collections.Collection;
 
 /**
  * Class representing a complete binary tree.
@@ -18,7 +19,7 @@ public class CompleteBinaryTree<T> extends BinaryTree<T> {
          * Constructs a new iterator for the complete binary tree.
          */
         public IteratorCBT() {
-            this.queue = new Queue<Node>();
+            this.queue = new Queue<>();
             if (root != null) {
                 queue.enqueue(root);
             }
@@ -35,18 +36,17 @@ public class CompleteBinaryTree<T> extends BinaryTree<T> {
                 throw new NoSuchElementException();
             }
 
-            Node node = this.queue.dequeue();
+            Node nextNode = this.queue.dequeue();
 
-            if (node.hasLeftChild()) {
-                Node left = (Node) node.leftChild();
-                this.queue.enqueue(left);
+            if (nextNode.hasLeft()) {
+                this.queue.enqueue(nextNode.leftChild);
             }
 
-            if (node.hasRightChild()) {
-                Node right = (Node) node.rightChild();
-                this.queue.enqueue(right);
+            if (nextNode.hasRight()) {
+                this.queue.enqueue(nextNode.rightChild);
             }
-            return node.get();
+
+            return nextNode.element;
         }
     }
 
@@ -57,45 +57,56 @@ public class CompleteBinaryTree<T> extends BinaryTree<T> {
         super();
     }
 
-    // public CompleteBinaryTree(Collection<T> collection) {
-    // super();
-    // }
+    /**
+     * Constructs a complete binary tree containing the elements of the specified
+     * collection.
+     *
+     * @param collection the collection whose elements are to be placed into this
+     *                   tree
+     */
+    public CompleteBinaryTree(Collection<T> collection) {
+        super(collection);
+    }
 
     /**
      * Adds the specified element to this tree.
      *
      * @param element the element to be added
+     * @throws IllegalArgumentException if the element is null
      */
     @Override
     public void add(T element) {
-        Node newNode = new Node(element);
-        this.elements += 1;
+        if (element == null) {
+            throw new IllegalArgumentException("Element cannot be null");
+        }
+
+        Node newNode = this.newNode(element);
+        this.elements++;
 
         if (this.root == null) {
             this.root = newNode;
             return;
         }
 
-        Queue<Node> queue;
-        queue = new Queue<Node>();
-        queue.enqueue((Node) this.root());
+        Queue<NodeBinaryTree<T>> queue = new Queue<>();
+        queue.enqueue(this.root);
 
         while (!queue.isEmpty()) {
-            Node node = queue.dequeue();
+            NodeBinaryTree<T> currentNode = queue.dequeue();
 
-            if (node.hasLeftChild()) {
-                queue.enqueue((Node) node.leftChild());
+            if (currentNode.hasLeft()) {
+                queue.enqueue(currentNode.leftChild());
             } else {
-                node.leftChild = newNode;
-                newNode.parent = node;
+                ((Node) currentNode).leftChild = newNode;
+                newNode.parent = (Node) currentNode;
                 return;
             }
 
-            if (node.hasRightChild()) {
-                queue.enqueue((Node) node.rightChild());
+            if (currentNode.hasRight()) {
+                queue.enqueue(currentNode.rightChild());
             } else {
-                node.rightChild = newNode;
-                newNode.parent = node;
+                ((Node) currentNode).rightChild = newNode;
+                newNode.parent = (Node) currentNode;
                 return;
             }
         }
@@ -108,9 +119,8 @@ public class CompleteBinaryTree<T> extends BinaryTree<T> {
      */
     @Override
     public void remove(T element) {
-        Node foundNode = (Node) this.search(element);
-
-        if (foundNode == null) {
+        Node found = (Node) this.search(element);
+        if (found == null) {
             return;
         }
 
@@ -121,54 +131,53 @@ public class CompleteBinaryTree<T> extends BinaryTree<T> {
             return;
         }
 
-        Queue<Node> queue;
-        queue = new Queue<Node>();
-        queue.enqueue((Node) this.root());
-        Node lastNode = null;
+        Queue<NodeBinaryTree<T>> queue = new Queue<>();
+        NodeBinaryTree<T> currentNode = null;
+        queue.enqueue(this.root);
 
         while (!queue.isEmpty()) {
-            lastNode = queue.dequeue();
+            currentNode = queue.dequeue();
 
-            if (lastNode.hasLeftChild()) {
-                queue.enqueue((Node) lastNode.leftChild());
+            if (currentNode.hasLeft()) {
+                queue.enqueue(currentNode.leftChild());
             }
 
-            if (lastNode.hasRightChild()) {
-                queue.enqueue((Node) lastNode.rightChild());
+            if (currentNode.hasRight()) {
+                queue.enqueue(currentNode.rightChild());
             }
         }
 
+        Node lastNode = ((Node) currentNode);
         T tmp = lastNode.element;
-        lastNode.element = foundNode.element;
-        foundNode.element = tmp;
 
-        Node itsParent = lastNode.parent;
-        if (itsParent.hasLeftChild()) {
-            Node node = (Node) itsParent.leftChild();
-            if (node.element.equals(element)) {
-                itsParent.leftChild = null;
-            }
+        lastNode.element = element;
+        found.element = tmp;
+
+        Node parent = lastNode.parent;
+
+        if (parent.hasLeft() && parent.leftChild.equals(lastNode)) {
+            parent.leftChild = null;
+            return;
         }
 
-        if (itsParent.hasRightChild()) {
-            Node node = (Node) itsParent.rightChild();
-            if (node.element.equals(element)) {
-                itsParent.rightChild = null;
-            }
+        if (parent.hasRight() && parent.rightChild.equals(lastNode)) {
+            parent.rightChild = null;
+            return;
         }
     }
 
     /**
      * Returns the height of this tree.
      *
-     * @return the height of the tree
+     * @return the height of the tree, or -1 if the tree is empty
      */
     @Override
     public int height() {
-        if (this.isEmpty()) {
-            return 0;
+        if (this.root == null) {
+            return -1;
         }
-        return (int) (Math.log(this.elements) / Math.log(2)) + 1;
+
+        return (int) (Math.floor(Math.log(this.elements) / Math.log(2)));
     }
 
     @Override
@@ -183,20 +192,20 @@ public class CompleteBinaryTree<T> extends BinaryTree<T> {
      * @param action the action to be applied to each node
      */
     public void bfs(ActionNodeBinaryTree<T> action) {
-        Queue<NodeBinaryTree<T>> queue;
-        queue = new Queue<NodeBinaryTree<T>>();
-        queue.enqueue(this.root());
+        Queue<NodeBinaryTree<T>> queue = new Queue<>();
+        queue.enqueue(this.root);
 
         while (!queue.isEmpty()) {
-            NodeBinaryTree<T> node = queue.dequeue();
-            action.current(node);
+            NodeBinaryTree<T> currentNode = queue.dequeue();
 
-            if (node.hasLeftChild()) {
-                queue.enqueue(node.leftChild());
+            action.current(currentNode);
+
+            if (currentNode.hasLeft()) {
+                queue.enqueue(currentNode.leftChild());
             }
 
-            if (node.hasRightChild()) {
-                queue.enqueue(node.rightChild());
+            if (currentNode.hasRight()) {
+                queue.enqueue(currentNode.rightChild());
             }
         }
     }

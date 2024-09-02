@@ -1,5 +1,5 @@
 import java.util.NoSuchElementException;
-
+import collections.Collection;
 /**
  * Abstract class representing a binary tree.
  *
@@ -24,39 +24,13 @@ public abstract class BinaryTree<T> implements Collection<T> {
          */
         public Node(T element) {
             if (element == null) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Element cannot be null");
             }
+
             this.element = element;
             this.parent = null;
             this.leftChild = null;
             this.rightChild = null;
-        }
-
-        /**
-         * Searches for a node containing the specified element.
-         *
-         * @param element the element to search for
-         * @return the node containing the element, or null if not found
-         */
-        public Node search(T element) {
-            if (this.element.equals(element)) {
-                return this;
-            }
-
-            if (this.hasLeftChild()) {
-                NodeBinaryTree<T> left = this.leftChild.search(element);
-                if (left != null) {
-                    return (Node) left;
-                }
-            }
-
-            if (this.hasRightChild()) {
-                NodeBinaryTree<T> right = this.leftChild.search(element);
-                if (right != null) {
-                    return (Node) right;
-                }
-            }
-            return null;
         }
 
         @Override
@@ -65,51 +39,56 @@ public abstract class BinaryTree<T> implements Collection<T> {
         }
 
         @Override
-        public boolean hasLeftChild() {
+        public boolean hasLeft() {
             return this.leftChild != null;
         }
 
         @Override
-        public boolean hasRightChild() {
+        public boolean hasRight() {
             return this.rightChild != null;
         }
 
         @Override
         public NodeBinaryTree<T> parent() {
             if (!this.hasParent()) {
-                throw new NoSuchElementException();
+                throw new NoSuchElementException("No parent node");
             }
+
             return this.parent;
         }
 
         @Override
         public NodeBinaryTree<T> leftChild() {
-            if (!this.hasLeftChild()) {
-                throw new NoSuchElementException();
+            if (!this.hasLeft()) {
+                throw new NoSuchElementException("No left child node");
             }
+
             return this.leftChild;
         }
 
         @Override
         public NodeBinaryTree<T> rightChild() {
-            if (!this.hasRightChild()) {
-                throw new NoSuchElementException();
+            if (!this.hasRight()) {
+                throw new NoSuchElementException("No right child node");
             }
+
             return this.rightChild;
         }
 
         @Override
         public int height() {
-            int heightLeftChild = this.leftChild != null ? this.leftChild.height() : 0;
-            int heightRightChild = this.rightChild != null ? this.rightChild.height() : 0;
-            return 1 + Math.max(heightLeftChild, heightRightChild);
+            int leftHeight = this.hasLeft() ? this.leftChild.height() : -1;
+            int rightHeight = this.hasRight() ? this.rightChild.height() : -1;
+
+            return 1 + Math.max(leftHeight, rightHeight);
         }
 
         @Override
         public int depth() {
-            if (this.parent == null) {
+            if (!this.hasParent()) {
                 return 0;
             }
+
             return 1 + this.parent.depth();
         }
 
@@ -132,16 +111,27 @@ public abstract class BinaryTree<T> implements Collection<T> {
             @SuppressWarnings("unchecked")
             Node node = (Node) object;
 
-            if (this.element != node.element) {
+            if (!this.element.equals(node.element)) {
                 return false;
             }
 
-            if (this.leftChild == null && this.rightChild != null
-                    || this.leftChild != null && this.rightChild == null) {
+            return this.equals(this.leftChild, node.leftChild) && this.equals(this.rightChild, node.rightChild);
+        }
+
+        private boolean equals(Node left, Node right) {
+            if (left == null && right == null) {
+                return true;
+            }
+
+            if (left == null || right == null) {
                 return false;
             }
 
-            return this.leftChild.equals(node.leftChild) && this.rightChild.equals(node.rightChild);
+            if (!left.element.equals(right.element)) {
+                return false;
+            }
+
+            return this.equals(left.leftChild, right.leftChild) && this.equals(left.rightChild, right.rightChild);
         }
     }
 
@@ -168,7 +158,7 @@ public abstract class BinaryTree<T> implements Collection<T> {
 
     @Override
     public boolean contains(T element) {
-        return this.search(element) != null;
+        return this.search(this.root, element) != null;
     }
 
     @Override
@@ -195,12 +185,16 @@ public abstract class BinaryTree<T> implements Collection<T> {
         @SuppressWarnings("unchecked")
         BinaryTree<T> tree = (BinaryTree<T>) object;
 
+        if (root == null && tree.root == null) {
+            return true;
+        }
+
         return this.root.equals(tree.root);
     }
 
     @Override
     public String toString() {
-        return "no, bud";
+        return "BinaryTree with " + elements + " elements";
     }
 
     /**
@@ -210,40 +204,35 @@ public abstract class BinaryTree<T> implements Collection<T> {
      * @return the node containing the element, or null if not found
      */
     public NodeBinaryTree<T> search(T element) {
-        if (this.root == null) {
+        return this.search(this.root, element);
+    }
+
+    protected Node search(Node node, T element) {
+        if (node == null) {
             return null;
         }
 
-        if (this.root.element == element) {
-            return this.root;
+        if (node.element.equals(element)) {
+            return node;
         }
 
-        if (this.root.hasLeftChild()) {
-            NodeBinaryTree<T> node = this.root.leftChild.search(element);
-            if (node != null) {
-                return node;
-            }
-        }
+        Node left = this.search(node.leftChild, element);
+        Node right = this.search(node.rightChild, element);
 
-        if (this.root.hasRightChild()) {
-            NodeBinaryTree<T> node = this.root.rightChild.search(element);
-            if (node != null) {
-                return node;
-            }
-        }
-        return null;
+        return left != null ? left : right;
     }
 
     /**
      * Returns the root node of this tree.
      *
      * @return the root node
-     * @throws IllegalArgumentException if the tree is empty
+     * @throws NoSuchElementException if the tree is empty
      */
     public NodeBinaryTree<T> root() {
         if (this.root == null) {
-            throw new IllegalArgumentException();
+            throw new NoSuchElementException("The tree is empty");
         }
+
         return this.root;
     }
 
