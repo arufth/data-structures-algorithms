@@ -15,6 +15,7 @@ This repository contains implementations of various data structures and algorith
 - **data_structures**: Contains implementations of various data structures.
   - **binary_tree**: Contains classes related to binary trees.
     - Complete Binary Tree
+    - Binary Search Tree
   - **linked_list**:
     - Doubly Linked List
   - **queue**
@@ -26,3 +27,6 @@ This repository contains implementations of various data structures and algorith
 
 ### Rust
 - Placeholder for future Rust implementations.
+
+## Correctness
+Each implementation is tested for correctness using unit tests. 
