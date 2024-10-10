@@ -7,10 +7,10 @@
 @FunctionalInterface
 public interface ActionNodeBinaryTree<T> {
 
-    /**
-     * Performs an action on the specified node.
-     *
-     * @param node the node on which the action is performed
-     */
-    public void current(NodeBinaryTree<T> node);
+  /**
+   * Performs an action on the specified node.
+   *
+   * @param node the node on which the action is performed
+   */
+  public void current(NodeBinaryTree<T> node);
 }
